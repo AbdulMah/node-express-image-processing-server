@@ -50,7 +50,6 @@ const imageProcessor = (filename) => {
 
         monochromeWorker.on('message', (message) => {
           monochromeWorkerFinished = true;
-
           if ( resizeWorkerFinished ) {
             resolve('monochromeWorker finished processing');
           }
