@@ -33,7 +33,7 @@ router.post('/upload', upload.single('photo'),  async (request, response) => {
     if (request.fileValidationError) return response.status(400).json({error: request.fileValidationError});
     
     try {
-        await imageProcessor(request.file.filename)
+        await imageProcessor(request.file.filename);
     } catch{
         
     }; 
