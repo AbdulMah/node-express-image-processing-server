@@ -47,7 +47,7 @@ const imageProcessor = (filename) => {
         resizeWorker.on('exit', (code) => {
           if ( code !== 0 ) reject(new Error(`Exited with status code ${code}`));
         });
-
+        
         monochromeWorker.on('message', (message) => {
           monochromeWorkerFinished = true;
           if ( resizeWorkerFinished ) {
