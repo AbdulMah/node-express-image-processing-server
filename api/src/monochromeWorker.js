@@ -5,5 +5,5 @@ gm(workerData.source)
     .monochrome()
     .write(workerData.destination, (error) => {
         if (error) throw error;
-        parentPort.postMessage({monochrome: true});
-    })
+        parentPort.postMessage({monochrome: true})
+    });

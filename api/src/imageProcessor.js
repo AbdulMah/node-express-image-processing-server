@@ -1,20 +1,17 @@
-const { SourceMap } = require('module');
-const { resolve } = require('path');
 const path = require('path');
-const { reject } = require('ramda');
-const { Worker, isMainThread } = require('worker_threads');
+const {Worker, isMainThread} = require('worker_threads');
 
 
-const uploadToResizeWorker = path.resolve(__dirname, 'resizeWorker.js');
-const pahtToMonoChromeWorker = path.resolve(__dirname, 'monochromeworker.js');
+const pathToResizeWorker = path.resolve(__dirname, 'resizeWorker.js');
+const pathToMonochromeWorker = path.resolve(__dirname, 'monochromeWorker.js');
 
 const uploadPathResolver = (filename) => {
     return path.resolve(__dirname, '../uploads', filename);
-}
+};
 
-const imageProcessor = () => {
+const imageProcessor = (filename) => {
     const resizeWorkerFinished = false;
-    const monochromeFinished = false;
+    const monochromeWorkerFinished = false;
 
     const sourcePath = uploadPathResolver(filename);
     const resizedDestination = uploadPathResolver('resized-' + filename);
@@ -26,13 +23,21 @@ const imageProcessor = () => {
                 const resizeWorker = new Worker(pathToResizeWorker, {
                     workerData: {
                         source: sourcePath,
+                        destination: resizedDestination,
+                    },
+                });
+
+                const monochromeWorker = new Worker(pathToMonochromeWorker, {
+                    workerData: {
+                        source: sourcePath,
                         destination: monochromeDestination,
                     },
                 });
+
                 resizeWorker.on('message', (message) => {
                     resizeWorkerFinished = true;
-                    if (monochromeFinished) {
-                        resolve('resozeWorker finished processing');
+                    if (monochromeWorkerFinished) {
+                        resolve('resizeWorker finished processing');
                     }
                 });
                 resizeWorker.on('error', (error) => {
@@ -46,10 +51,14 @@ const imageProcessor = () => {
                 });
 
                 monochromeWorker.on('message', (message) => {
-                    monochromeFinished = true;
+                    monochromeWorkerFinished = true;
                     if (resizeWorkerFinished){
                         resolve('monochromeWorker finished processing');
                     }
+                });
+
+                monochromeWorker.on('error', (error) => {
+                    reject(new Error(error.message));
                 });
                 
                 monochromeWorker.on('exit', (code) => {
@@ -65,3 +74,5 @@ const imageProcessor = () => {
         }
     });
 };
+
+module.exports = imageProcessor;

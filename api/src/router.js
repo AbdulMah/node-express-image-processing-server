@@ -1,5 +1,6 @@
-const { Router, response } = require('express');
+const {Router} = require('express');
 const multer = require('multer');
+const path = require('path');
 const imageProcessor = require('./imageProcessor');
 const photoPath = path.resolve(__dirname, '../../client/photo-viewer.html');
 
@@ -10,7 +11,7 @@ const filename = (request, file, callback) => {
 };
 
 const storage = multer.diskStorage({
-    destination: 'api/uploads/', 
+    destination: 'api/uploads', 
     filename,
 });
 
@@ -39,7 +40,7 @@ router.post('/upload', upload.single('photo'), async (request, response) => {
     return response.status(201).json({success: true});
 });
 
-router.get('/photo-view', (request, response) => {
+router.get('/photo-viewer', (request, response) => {
     response.sendFile(photoPath);
 });
 
